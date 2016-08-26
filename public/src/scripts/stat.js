@@ -111,6 +111,8 @@ function genTable(stat){
     str = str + '<p class="email"><b>Заказы только с e-mail: </b><span class="email">' +  addSpaces(stat.countEmail) + '</span></p>';
     str = str + '<p class="email-phone"><b>Общее кол-во заказов тел+email: </b><span class="email-phone">' +  addSpaces(stat.countPhoneEmail) + '</span></p>';
     str = str + '<p class="broken"><b>Заказы без контактов: </b><span class="broken">' +  addSpaces(stat.countBreakLines) + '</span></p>';
+    /*
+    Данный блок из текстового заменён на табличный
     //str = str + '<p class="orders"><b>Общее количество заказов: </b><span class="orders">' +  addSpaces(parseInt(stat.countBreakLines) + parseInt(stat.countPhoneEmail)) + ' ('  + stat.allOrders+ ')'+ '</span></p>';
     //str = str + '<p class="clients"><b>Общее количество клиентов: </b><span class="single-clients">' +  addSpaces(parseInt(stat.singleClientOrders) + parseInt(stat.doubleClients)) + '</span></p>';
     //str = str + '<p class="check"><b>Оборот: </b><span class="phone">' +  addSpaces(stat.allMoney) + '<i> руб.</i></span></p>';
@@ -118,9 +120,12 @@ function genTable(stat){
     //    addSpaces(parseFloat(parseFloat(stat.allMoney)/(parseInt(stat.singleClientOrders) +
     //        parseInt(stat.doubleClients))).toFixed(2)) + '<i> руб.</i></span></p>';
     //str = str + '<p class="check"><b>Средний чек с заказа(по всем заказам): </b><span class="phone">' +  addSpaces(parseFloat(stat.checkAll).toFixed(2)) + '<i> руб.</i></span></p>';
+    */
     console.debug('str - completed!');
     var fullOrders = parseInt(stat.countPhone) + parseInt(stat.countEmail) + parseInt(stat.countBreakLines);
 
+    /*
+    Данный блок из текстового заменён на табличный
     //str = str + '<br /><br /><h3>Разовые заказы и разовые клиенты</h3>';
     //str = str + '<p class="single-clients"><b>Разовые клиенты: </b><span class="single-clients">' +  addSpaces(stat.singleClientOrders) + '</span></p>';
     //str = str + '<p class="single-orders"><b>Количество заказов: </b><span class="single-orders">' +  addSpaces(stat.singleClientOrders) + '</span></p>';
@@ -134,7 +139,7 @@ function genTable(stat){
     //str = str + '<p class="double-sum"><b>Поступившая сумма от постоянных клиентов: </b><span class="double-sum">' +  addSpaces(stat.doubleClientsSum) + '<i> руб.</i></span></p>';
     //str = str + '<p class="double-client-sum"><b>Средняя сумма от клиента: </b><span class="double-client-sum">' +  addSpaces(parseFloat(stat.doubleClientsCheck).toFixed(2)) + '<i> руб.</i></span></p>';
     //str = str + '<p class="double-check"><b>Средний чек: </b><span class="double-check">' +  addSpaces((parseFloat(stat.doubleClientsSum)/parseFloat(stat.doubleClientsOrders)).toFixed(2)) + '<i> руб.</i></span></p>';
-
+    */
     var tableData = '<h3>Сводная таблица</h3><table><tr style="font-weight: bold;text-align: center;"><td>Наименование</td><td>Общие показатели</td><td>Разовые клиенты</td><td>Постоянные клиенты</td></tr>';
     tableData = tableData + '<tr style="background-color:#f9f9f9"><td>Заказы</td><td>' +  addSpaces(stat.allOrders) + '</td><td>'  +
         addSpaces(stat.singleClientOrders) + '</td><td>'  + addSpaces(stat.doubleClientsOrders) + '</td></tr>';
@@ -195,7 +200,7 @@ function genTable(stat){
     drawChart2(dataGraphArr);
     drawChartOneVsDouble({'Разовые клиенты': singleOrderClients,'Постоянные клиенты': stat.doubleClientsOrders})
     drawChartSumOneVsDouble({'Разовые клиенты': stat.singleClientSum,'Постоянные клиенты': stat.doubleClientsSum});
-    drawChartSum({'Разовые клиенты': stat.singleClientCheck,'Постоянные клиенты': stat.doubleClientsSum, 'Общий Оборот': stat.allMoney});
+    drawChartSum({'Разовые клиенты': stat.singleClientSum,'Постоянные клиенты': stat.doubleClientsSum, 'Общий Оборот': stat.allMoney});
     drawChartClientSum({'Разовые клиенты': parseFloat(parseFloat(stat.singleClientCheck).toFixed(2)), 'Постоянные клиенты': stat.doubleClientsCheck, 'По всем клиентам': parseFloat(parseFloat(parseFloat(stat.allMoney)/(parseInt(stat.singleClientOrders) +parseInt(stat.doubleClients))).toFixed(2))});
     drawChartClientCheck({'Разовые клиенты': stat.singleClientCheck,'Постоянные клиенты': stat.doubleClientsOrderCheck, 'Общий Оборот': stat.checkAll});
 }
