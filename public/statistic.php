@@ -19,6 +19,13 @@ header('Content-Type: text/html;charset=UTF-8');
     <script src="src/scripts/stat.js"></script>
     <script src="src/scripts/jquery-ui.min.js"></script>
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    
+<style>
+    td{
+        min-width: 200px;
+        text-align: right;
+    }
+</style>
 
 </head>
 <body>
@@ -41,6 +48,20 @@ header('Content-Type: text/html;charset=UTF-8');
 <div id="chart3-div" class="ui-widget ui-corner-all graph-data">
     <!-- -->
 </div>
+<div id="chart4-div" class="ui-widget ui-corner-all graph-data">
+    <!-- -->
+</div>
+
+<div id="chart5-div" class="ui-widget ui-corner-all graph-data">
+    <!-- -->
+</div>
+<div id="chart6-div" class="ui-widget ui-corner-all graph-data">
+    <!-- -->
+</div>
+<div id="chart7-div" class="ui-widget ui-corner-all graph-data">
+    <!-- -->
+</div>
+
 
 <?php
 /**

@@ -87,6 +87,7 @@ function getdata($filename){
     $result=array();
     $phoneArr=array();
     $emailArr=array();
+    $fullArrClients=array();
     $text = file($filename);
     //echo "<h1>Список постоянных клиентов</h1>";
     //echo "<table>";
@@ -101,7 +102,7 @@ function getdata($filename){
             $arr[2]=phoneReplaceSymbol($arr[2]);
             $arr[3]= strDoCompare($arr[3]);
             if (((float)$arr[6]>0)&&(strcmp($arr[9],"ВИП'S")!=0)&&(strcmp($arr[13],"1")==0)){
-
+                $fullArrClients[$numLine] = $arr;
                 if (preg_match("/\d/",$arr[2])){
                     $phoneArr[$arr[2]][$numLine]=$arr;
                     $countPhone++;
@@ -118,84 +119,39 @@ function getdata($filename){
                 //
                 $countLine++;
             }
+            /*if (((float)$arr[6]>0)&&(strcmp($arr[13],"1")==0)){
+                $fullArrClients[$numLine] = $arr;
+            }*/
         }
 
     }
+
+    $moneyAll = getAllMoney($fullArrClients);
+    $result['allMoney'] = $moneyAll['money'];
+    $result['checkAll'] = $moneyAll['check'];
+    $result['allOrders'] = $moneyAll['orders'];
 
     $result['countBreakLines']=$countBreakLines;
     $result['countPhone']=$countPhone;
     $result['countEmail']=$countEmail;
     $result['countPhoneEmail']=$countEmail+$countPhone;
 
-    //echo "</table>";
-    /*
-     *
-     * Отладочная часть
-     *
-     * echo "<hr/>lines: $countLine<hr/>";
 
-    echo "<hr/>broken: $countBreakLines<hr/>";
-    echo "<hr/>Phone: $countPhone<hr/>";
-    echo "<hr/>Email: $countEmail<hr/>";
-
-
-    error_log('checking...',0);
-    error_log('checking... $phoneClients',0);
-    echo 'checking... $phoneClients<br />';
-    $phoneClients = getSumm($phoneArr);
-
-    echo 'checking... $emailClients<br />';
-    error_log('checking... $emailClients',0);
-    $emailClients = getSumm($emailArr);
-
-    error_log('completed check',0);
-    echo 'completed check<br />';
-
-    echo "Phone:<br/><table><tr>";
-    echo         "<td>Количество</td>" ;
-    echo         "<td>" . $phoneClients['clients'] . "</td></tr>" ;
-    echo         "<tr><td>Сумма</td>";
-    echo         "<td>" . $phoneClients['sum'] . "</td></tr>" ;
-    echo         "<tr><td>Средний доход</td>";
-    echo         "<td>" . round (($phoneClients['sum']/$phoneClients['clients']),2)  . "</td></tr>" ;
-    echo     "</table>";
-    echo "E-mail:<br/><table>";
-    echo         "<td>Количество</td>" ;
-    echo         "<td>" . $emailClients['clients'] . "</td></tr>" ;
-    echo         "<tr><td>Сумма</td>";
-    echo         "<td>" . $emailClients['sum'] . "</td></tr>" ;
-    echo         "<tr><td>Средний доход</td>";
-    echo         "<td>" . round (($emailClients['sum']/$emailClients['clients']),2)  . "</td></tr>" ;
-    echo     "</table>";
-    echo "Double:<br/><table><tr>";
-
-    error_log('checking double...',0);*/
     $doubleClients = doubleClients($phoneArr,$emailArr);
     ksort($doubleClients);
 
-    // вывод таблицы с повторяющимися клиентами и заказами
-    // tblClients($doubleClients,0);
-
-
-
-    /*
-     *
-     * вывод данных
-     *
-     * $sumDouble = getSumm($doubleClients);
-    echo         "<table><tr><td>Количество</td>" ;
-    echo         "<td>" . $sumDouble['clients'] . "</td></tr>" ;
-    echo         "<tr><td>Сумма</td>";
-    echo         "<td>" . $sumDouble['sum'] . "</td></tr>" ;
-    echo         "<tr><td>Средний доход</td>";
-    echo         "<td>" . round (($sumDouble['sum']/$sumDouble['clients']),2)  . "</td></tr>" ;
-    echo     "</table>";*/
 
     $sumDouble = getSumm($doubleClients);
     $result['doubleClients'] = $sumDouble['clients'];
     $result['doubleClientsOrders'] = $sumDouble['orders'];
     $result['doubleClientsSum'] = $sumDouble['sum'];
     $result['doubleClientsCheck'] = round (($sumDouble['sum']/$sumDouble['clients']),2);
+    //средний чек
+    $result['doubleClientsOrderCheck'] = round (($sumDouble['sum']/$sumDouble['orders']),2);
+
+    $result['singleClientOrders'] = $moneyAll['orders'] - $sumDouble['orders'];
+    $result['singleClientSum'] = $moneyAll['money'] - $sumDouble['sum'];
+    $result['singleClientCheck'] = $result['singleClientSum']/$result['singleClientOrders'];
 
     $maxOrder = 10;
     $maxOrderLbl = "более " . $maxOrder;
@@ -221,19 +177,17 @@ function getdata($filename){
         $arrOrderCounts[(string)$keyOrderCount]['sumPerClient'] = round (($clientSum['sum']/$clientSum['clients']),2);
     }
     $result['orderStat'] = $arrOrderCounts;
-    /*
-     *
-     * Вывод данных
-     *
-     * echo "<table><tr><td>Кол-во заказов</td><td>Кол-во клиентов</td><td>Сумма</td><td>Средний доход</td></tr>";
-    foreach ($perCountOrderArr as $keyClientCount=>$valClientArr){
-        echo "<td>$keyClientCount</td>";
-        $clientSum = getSumm($valClientArr);
-        echo "<td>" . $clientSum['clients'] . "</td><td>" . $clientSum['sum'] . "</td><td>" . round (($clientSum['sum']/$clientSum['clients']),2) . "</td></tr>";
+
+    return $result;
+}
+
+function getAllMoney($arr){
+    $result = array('money'=>0,'check'=>0,'orders' => 0);
+    foreach ($arr as $key=>$val){
+        $result['money'] =$result['money']  + $val[6];
     }
-
-    echo "</table>";*/
-
+    $result['orders'] = count($arr);
+    $result['check'] = $result['money']/$result['orders'];
     return $result;
 }
 
@@ -258,13 +212,7 @@ function getSumm($reqArr){
             $countSingle++;
         }
     }
-    /*error_log('single:' . $countSingle,0);
-    error_log('double:' . $clients,0);
-    $full = ($countSingle+$clients);
-    error_log('full:' .$full ,0);
-    echo "single: $countSingle, <br />double: $clients, <br />full: $full <br /> <hr />";
-    //echo "single lines:" . countArrayLines($countSingle) . " , <br />double lines: " . countArrayLines($clients) . ", <br /><hr />";
-    */
+
     return array(
         "clients"=>$clients,
         "sum"=>$sum,
@@ -274,32 +222,15 @@ function getSumm($reqArr){
 
 function doubleClients($phone, $email){
 
-    /*error_log('phoneArr: ' . countArrayLines($phone),0);
-    error_log('emailArr: ' . countArrayLines($email),0);
-    echo "<h3>Double clients</h3><hr />" . 'phoneArr: ' . countArrayLines($phone) . "<br />" .
-        'emailArr: ' . countArrayLines($email) . "<br />";*/
-
 
     $compareArr = comparePhoneEmail($phone,$email);
     $doubleArr=$compareArr['double'];
-    /*echo "doubleArr lines: " . countArrayLines($doubleArr) .
-        "<br />doubleArr keys: " . countArrayKeys($doubleArr) . "<br />";*/
 
     $doubleArr = comparePhoneDouble($doubleArr,$phone);
 
-    /*echo "doubleArr lines: " . countArrayLines($doubleArr) .
-        "<br />doubleArr keys: " . countArrayKeys($doubleArr) . "<br />";*/
 
     $doubleArr = compareDoubleEmail($doubleArr,$compareArr['wophone']);
 
-    /*echo "doubleArr lines: " . countArrayLines($doubleArr) .
-        "<br />doubleArr keys: " . countArrayKeys($doubleArr) . "<br />";*/
-
-    /*$singleDouble = getDoubleVsSinglePhone($phone,$doubleArr);
-    echo "doubleArr lines(2 etter): " . countArrayLines($singleDouble['double']) .
-        "<br />doubleArr keys(2 etter): " . countArrayKeys($singleDouble['double']) . "<br />";*/
-
-    //return $singleDouble['double'];
     return $doubleArr;
 
 }
